@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "Hoa Đỗ Quyên",
+    "description": "Hoa đỗ quyên có màu sắc rực rỡ, bông nở thành chùm, phù hợp trồng trong chậu hoặc sân vườn. Cây ưa sáng nhẹ, nở đẹp vào cuối đông – đầu xuân.",
+    "image": "doquyen.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Hoa Hải Đường",
+    "description": "Hoa hải đường có dáng hoa sang trọng, màu hồng – đỏ nổi bật. Lá xanh bóng, hoa thơm nhẹ. Phù hợp trồng làm cảnh trong chậu hoặc viền lối đi.",
+    "image": "haiduong.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Hoa Mai",
+    "description": "Hoa mai có màu vàng rực rỡ, tượng trưng cho may mắn và thịnh vượng. Cây ưa nắng, nở rộ vào dịp Tết và đầu xuân, thích hợp trồng chậu hoặc sân vườn.",
+    "image": "mai.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Hoa Tường Vy",
+    "description": "Hoa tường vy có cánh nhỏ mỏng manh, màu hồng nhẹ, mọc thành chùm rất duyên dáng. Là cây leo khỏe, thích hợp trồng giàn, cổng, ban công hoặc sân thượng.",
+    "image": "tuongvy.jpg"
+  }
+]
+
+  
+
