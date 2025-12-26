@@ -1,0 +1,28 @@
+
+cd /d/Documents/CSE_TLU/CongNgheWeb/xampp/htdocs/CSE485/ThucHanh
+laravel new ten-du-an
+cd ten-du-an
+php artisan serve
+
+
+- Tạo db trong phpadmin
+- Cấu hình env DB_DATABASE=..........
+
+Tạo MIGRATE: 
+
+1. php artisan make:migration create_students_table  ----> Tạo bảng có khóa ngoại trước
+2. Chỉnh sửa file cấu hình trong database/migrations/ 
+3. Chạy lệnh:  php artisan migrate
+
+---> Lần lượt với các bang khác
+
+
+Tạo SEEDER:
+
+1. php artisan make:seeder StudentsTableSeeder
+   php artisan make:seeder ThesesTableSeeder
+	----> Tạo cho các bang
+2. Chỉnh sửa cấu hình trong file database/seeders/
+3. php artisan db:seed
+
+

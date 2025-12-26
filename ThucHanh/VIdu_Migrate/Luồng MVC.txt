@@ -1,0 +1,87 @@
+======================================================================
+           HƯỚNG DẪN LUỒNG MVC - DỰ ÁN QUẢN LÝ NHÂN VIÊN
+======================================================================
+
+I. LUỒNG HOẠT ĐỘNG CHI TIẾT (USER FLOW)
+
+1. Dashboard (Trang chủ/Danh sách)
+----------------------------------
+   - Hành động: Người dùng truy cập URL `/employees`.
+   - Route: Nhận request `GET`, gọi `EmployeeController@index`.
+   - Controller:
+     + Chạy hàm `index()`.
+     + Gọi Model: `Employee::with('department')->paginate(10)`.
+     + (Logic: Lấy nhân viên kèm phòng ban để tránh lỗi N+1 query).
+   - Database: Model gửi SQL `SELECT` xuống MySQL -> nhận dữ liệu thô -> chuyển thành Object.
+   - View: Controller trả dữ liệu sang `employees.index`. View dùng vòng lặp vẽ bảng.
+
+2. Thêm mới (Create)
+--------------------
+   A. Giai đoạn hiển thị Form:
+      - Hành động: Bấm nút "Thêm mới".
+      - Route: `GET /employees/create` -> gọi `create()`.
+      - Controller: Gọi `Department::all()` lấy danh sách phòng ban.
+      - View: Hiển thị form trống kèm dropdown phòng ban.
+
+   B. Giai đoạn Lưu (Store):
+      - Hành động: Bấm "Lưu".
+      - Route: `POST /employees` -> gọi `store()`.
+      - Controller: 
+        + Validate (Kiểm tra rỗng, email unique).
+        + Nếu đúng: Gọi `Employee::create(...)`.
+      - Database: Chạy lệnh `INSERT`.
+      - Kết quả: Redirect về trang danh sách + Thông báo thành công.
+
+3. Cập nhật (Update)
+--------------------
+   A. Giai đoạn hiển thị Form cũ:
+      - Hành động: Bấm nút "Sửa" (ví dụ ID=5).
+      - Route: `GET /employees/5/edit` -> gọi `edit(5)`.
+      - Controller: Tìm nhân viên (`findOrFail`) và lấy list phòng ban.
+      - View: Hiển thị form, tự điền dữ liệu cũ vào các ô input (`value="..."`).
+
+   B. Giai đoạn Lưu sửa đổi:
+      - Hành động: Bấm "Cập nhật".
+      - Route: Form gửi `POST` kèm `@method('PUT')` -> Route hiểu là `PUT` -> gọi `update(5)`.
+      - Controller:
+        + Validate: Check email unique TRỪ chính ID đang sửa.
+        + Gọi `$employee->update(...)`.
+      - Database: Chạy lệnh `UPDATE`.
+      - Kết quả: Redirect về trang danh sách + Thông báo.
+
+4. Xóa (Delete)
+---------------
+   - Hành động: Bấm nút "Xóa" -> Xác nhận Popup Javascript.
+   - Route: Form gửi `POST` kèm `@method('DELETE')` -> Route hiểu là `DELETE` -> gọi `destroy(5)`.
+   - Controller: Tìm ID (`findOrFail`) -> Gọi `$employee->delete()`.
+   - Database: Chạy lệnh `DELETE`.
+   - Kết quả: Redirect về danh sách, dòng dữ liệu biến mất.
+
+======================================================================
+II. CÁC CÂU HỎI VẤN ĐÁP THƯỜNG GẶP (Q&A)
+======================================================================
+
+Câu 1: Tại sao trong Controller dùng `with('department')`?
+TL: Để sử dụng Eager Loading. Nếu không có nó, Laravel sẽ chạy 1 query lấy nhân viên + 10 query lấy tên phòng ban cho 10 người (Lỗi N+1 Query). Dùng `with` gom lại chỉ còn 2 query, tối ưu hiệu năng.
+
+Câu 2: Hàm `compact()` là gì?
+TL: Là hàm PHP dùng để đóng gói các biến (ví dụ $employees) thành một mảng để truyền từ Controller sang View.
+
+Câu 3: Tại sao Form HTML sửa/xóa lại cần `@method('PUT')` hoặc `@method('DELETE')`?
+TL: Vì HTML Form mặc định chỉ hỗ trợ GET và POST. Laravel cần giả lập các phương thức PUT/DELETE để tuân thủ chuẩn RESTful.
+
+Câu 4: `@csrf` trong form là gì?
+TL: Là token bảo mật chống tấn công giả mạo (Cross-Site Request Forgery). Nếu thiếu, form sẽ không gửi được và báo lỗi 419 (Page Expired).
+
+Câu 5: Validation `unique:employees,email,'.$id` trong hàm Update nghĩa là gì?
+TL: Nghĩa là kiểm tra email có bị trùng trong bảng employees không, NHƯNG bỏ qua dòng có ID hiện tại. Để khi user giữ nguyên email cũ thì không bị báo lỗi.
+
+======================================================================
+III. CÁC LỆNH CƠ BẢN CẦN NHỚ
+======================================================================
+1. Chạy server:         php artisan serve
+2. Tạo bảng (Migration): php artisan migrate
+3. Nạp dữ liệu giả:     php artisan db:seed
+4. Tạo Controller:      php artisan make:controller TenController --resource
+5. Xóa cache (khi lỗi): php artisan optimize:clear
+

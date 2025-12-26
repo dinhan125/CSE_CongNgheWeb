@@ -1,0 +1,87 @@
+
+
+Cách 1 (Thủ công - Manual Definition): Bạn tự tay khai báo từng dòng một cho từng hành động (URL nào -> gọi hàm nào -> tên route là gì).
+
+
+use Illuminate\Support\Facades\Route; 
+use App\Http\Controllers\PostController; 
+
+<?php 
+use Illuminate\Support\Facades\Route; 
+use App\Http\Controllers\PostController; 
+// returns the home page with all posts 
+Route::get('/', PostController::class .'@index')->name('posts.index'); 
+// returns the form for adding a post 
+Route::get('/posts/create', PostController::class . '@create')
+>name('posts.create'); 
+// adds a post to the database 
+Route::post('/posts', PostController::class .'@store')
+>name('posts.store'); 
+// returns a page that shows a full post 
+Route::get('/posts/{post}', PostController::class .'@show')
+>name('posts.show'); 
+// returns the form for editing a post 
+Route::get('/posts/{post}/edit', PostController::class .'@edit')
+>name('posts.edit'); 
+// updates a post 
+Route::put('/posts/{post}', PostController::class .'@update')
+>name('posts.update'); 
+// deletes a post 
+Route::delete('/posts/{post}', PostController::class .'@destroy')
+>name('posts.destroy');
+
+
+STT	Phương thức(Method)	Đường dẫn (URI)		Gọi vào hàm (Action)	Chức năng
+1	GET			/employees		index()			Hiển thị danh sách nhân viên
+2	GET			/employees/create	create()		Hiển thị form thêm mới
+3	POST			/employees		store()			Lưu dữ liệu mới vào CSDL
+4	GET			employees/{id}		show()			Xem chi tiết 1 nhân viên
+5	GET			/employees/{id}/edit	edit()			Hiển thị form sửa
+6	PUT/PATCH		/employees/{id}		update()		Lưu cập nhật vào CSDL
+7	DELETE			/employees/{id}		destroy()		Xóa nhân viên
+
+
+
+
+Bước 1: Nhận diện (Input)
+Route sẽ nhìn vào 2 thông tin quan trọng nhất của yêu cầu:
+
+Đường dẫn (URI): Ví dụ /employees, /employees/create, /posts/5.
+
+Phương thức (HTTP Method): GET, POST, PUT, DELETE.
+
+Bước 2: So khớp (Matching)
+Laravel sẽ mang 2 thông tin trên đi dò trong file routes/web.php. Nó dò từ trên xuống dưới xem có dòng nào khớp không.
+
+Ví dụ 1: Khách gửi GET /employees. -> Route thấy khớp với dòng Route::resource('employees', ...) (phần index). -> Quyết định: Gọi hàm index().
+
+Ví dụ 2: Khách gửi POST /employees. -> Vẫn là đường dẫn đó, nhưng method là POST. -> Route thấy khớp với quy tắc lưu trữ. -> Quyết định: Gọi hàm store().
+
+Bước 3: Điều hướng (Dispatch)
+Sau khi tìm thấy cặp đôi hoàn hảo (URL + Method), Route sẽ khởi tạo Controller tương ứng và chạy hàm (Action) được chỉ định. Nếu dò hết file mà không thấy ai khớp? -> Route trả về lỗi 404 Not Found.
+
+3. Giải thích sâu về Route::resource (Dành cho vấn đáp)
+Nếu thầy cô hỏi: "Tại sao cùng một đường dẫn /employees mà lúc thì nó hiện danh sách, lúc thì nó lưu dữ liệu?"
+
+Câu trả lời: "Dạ thưa thầy/cô, đó là nhờ vào HTTP Method ạ. Route::resource thông minh ở chỗ nó phân biệt hành động dựa trên phương thức gửi đi:
+
+Nếu trình duyệt gửi phương thức GET vào /employees -> Route hiểu là muốn lấy dữ liệu -> Nó gọi hàm index.
+
+Nếu trình duyệt gửi phương thức POST vào /employees -> Route hiểu là muốn gửi/lưu dữ liệu mới -> Nó gọi hàm store.
+
+Nhờ cơ chế này mà code backend phân biệt được hành vi của người dùng dù đường dẫn giống hệt nhau ạ."
+
+4. Sơ đồ tóm tắt (Để ghi nhớ)
+Bạn có thể vẽ nhanh sơ đồ này ra giấy nháp:
+
+Người dùng (Browser) ⬇️ (Gửi Request: GET /employees) Route (Lễ tân - web.php) ⬇️ (So khớp: À, ông này muốn xem danh sách!) Controller (Bếp trưởng - EmployeeController@index) ⬇️ (Xử lý dữ liệu) View (Món ăn) ⬇️ (Trả về HTML) Người dùng (Browser)
+
+
+
+
+
+
+
+
+
+Cách 2 (Route::resource): Đây là một "đường tắt" (shortcut) của Laravel. Chỉ cần 1 dòng code, Laravel sẽ tự động sinh ra đủ 7 routes chuẩn RESTful tương ứng với 7 hành động CRUD (Index, Create, Store, Show, Edit, Update, Destroy).
